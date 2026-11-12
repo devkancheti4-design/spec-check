@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SpecCheck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo">✓</span> SpecCheck</div>
+    <select id="qSelect" class="q-select" aria-label="Question"></select>
+    <div class="actions">
+      <button id="resetBtn" class="btn ghost" title="Put the starter code back">↺ Reset</button>
+      <button id="solutionBtn" class="btn ghost" title="See a reference answer">💡 Solution</button>
+      <button id="runBtn" class="btn primary" title="Ctrl/⌘ + Enter">▶ Run tests</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <nav id="qList" class="q-list" aria-label="Questions"></nav>
+      <section class="task">
+        <div id="qTopic" class="topic"></div>
+        <h1 id="qTitle"></h1>
+        <h2 class="label">Your task</h2>
+        <div id="qTask" class="task-body"></div>
+      </section>
+    </aside>
+
+    <main class="editor-col">
+      <div class="tabs"><span class="tab active">‹/› app.js</span><span id="saveState" class="save-state">saved</span></div>
+      <div id="editorHost" class="editor-host"></div>
+    </main>
+
+    <section class="right">
+      <div class="panel preview-panel">
+        <div class="panel-head">Preview <span class="hint">fetch() uses sample data</span></div>
+        <iframe id="preview" sandbox="allow-scripts" title="Preview"></iframe>
+      </div>
+
+      <div class="panel results-panel">
+        <div id="scoreCard" class="score-card idle">
+          <div>
+            <div class="score-label">Score</div>
+            <div class="score"><span id="scoreNow">–</span><span class="of">/10</span></div>
+          </div>
+          <div class="score-msg" id="scoreMsg">Write your answer, then press <b>Run tests</b>.</div>
+          <div class="best">Best<br /><b id="bestScore">–</b></div>
+        </div>
+        <div id="summary" class="summary idle">
+          <div id="dots" class="dots"></div>
+          <div id="summaryText">No run yet</div>
+        </div>
+        <div id="loadError" class="load-error" hidden></div>
+        <ol id="specList" class="spec-list"></ol>
+      </div>
+
+      <div class="panel console-panel">
+        <div class="panel-head">Console <span id="consoleCount" class="hint"></span><button id="clearConsole" class="mini" title="Clear">⊘</button></div>
+        <div id="console" class="console"></div>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="solutionDlg" class="dlg">
+    <div class="dlg-head">
+      <b>Reference solution</b>
+      <div>
+        <button id="copySolution" class="btn ghost small">Copy</button>
+        <button id="useSolution" class="btn ghost small">Load into editor</button>
+        <button id="closeSolution" class="btn ghost small">✕</button>
+      </div>
+    </div>
+    <pre id="solutionCode" class="sol"></pre>
+  </dialog>
+
+  <iframe id="testFrame" sandbox="allow-scripts" title="Test runner" class="test-frame" aria-hidden="true"></iframe>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="harness.js"></script>
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
