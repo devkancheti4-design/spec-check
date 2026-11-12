@@ -76,7 +76,11 @@ function speccheckHarness(cfg) {
     window.fetch = spy;
     return spy;
   }
-  const defaultFetch = (url) => Promise.resolve(respond(cfg.mock == null ? [] : cfg.mock, { url: String(url) }));
+  let previewData = cfg.mock == null ? [] : cfg.mock;
+  if (cfg.mockExpr) {
+    try { previewData = new Function("return (" + cfg.mockExpr + ")")(); } catch (e) { /* bad mock line: keep [] */ }
+  }
+  const defaultFetch = (url) => Promise.resolve(respond(previewData, { url: String(url) }));
   window.fetch = defaultFetch;
 
   // ---------- assertions ----------
@@ -198,6 +202,70 @@ function speccheckHarness(cfg) {
     send("done", {});
   }
 
-  window.__t = { it, expect, expectAsync, mockFetch, respond, flush, sleep, start };
+  window.__t = { it, expect, expectAsync, mockFetch, respond, flush, sleep, start, fmt };
   window.__ready = () => { loading = false; send("ready", {}); };
+}
+
+// Turns the plain-text "checks" of a user-added question into specs. Also injected
+// with toString, so it must stay self-contained. One check per line:
+//   code => expected            e.g.  doubleAsync(5) => 10      (Promises are awaited)
+//   code => throws ["message"]  e.g.  rejectWith("boom") => throws "boom"
+//   mock: <data> | mock: fail | mock: status 404 [data] | mock: none
+//   # comment
+function speccheckChecks(t, text) {
+  const { it, expect, mockFetch, respond, fmt } = t;
+  const value = (src) => new Function("return (" + src + ")")();
+  const compile = (src) => new Function("return (async () => (\n" + src + "\n))();");
+  let mock = null;
+
+  function applyMock(m) {
+    if (!m || /^none$/i.test(m)) return;
+    if (/^fail$/i.test(m)) { mockFetch(() => Promise.reject(new TypeError("Failed to fetch"))); return; }
+    const st = m.match(/^status\s+(\d{3})\s*(.*)$/i);
+    if (st) { const d = st[2] ? value(st[2]) : {}; mockFetch(() => respond(d, { status: Number(st[1]) })); return; }
+    const d = value(m);
+    mockFetch(() => respond(d));
+  }
+
+  String(text || "").split(/\r?\n/).forEach((raw, i) => {
+    const line = raw.trim();
+    if (!line || line.startsWith("#") || line.startsWith("//")) return;
+    const mm = line.match(/^mock\s*:\s*(.*)$/i);
+    if (mm) { mock = mm[1].trim(); return; }
+
+    let idx = line.lastIndexOf(" => "), sep = 4;
+    const alt = line.lastIndexOf("→");
+    if (alt > idx) { idx = alt; sep = 1; }
+    if (idx < 0) {
+      it(line, () => { throw new Error('Check line ' + (i + 1) + ' needs " => " between the code and the expected result.'); });
+      return;
+    }
+    const lhs = line.slice(0, idx).trim();
+    const rhs = line.slice(idx + sep).trim();
+    const useMock = mock;
+
+    it(line, async () => {
+      let run;
+      try { run = compile(lhs); } catch (e) { throw new Error("This check is not valid JavaScript: " + e.message); }
+      try { applyMock(useMock); } catch (e) { throw new Error("The mock: line above this check is not valid JavaScript: " + e.message); }
+      const wantThrow = rhs.match(/^(throws|rejects)\b\s*(.*)$/i);
+      let got, err, threw = false;
+      try { got = await run(); } catch (e) { threw = true; err = e; }
+      if (wantThrow) {
+        if (!threw) throw new Error("Expected it to throw / reject, but it gave " + fmt(got));
+        // a missing function is not the error the question asks for
+        if (err instanceof ReferenceError) throw err;
+        if (wantThrow[2]) {
+          const msg = value(wantThrow[2]);
+          const actual = err && err.message !== undefined ? err.message : err;
+          if (actual !== msg) throw new Error("Expected the error message " + fmt(msg) + ", but got " + fmt(actual));
+        }
+        return;
+      }
+      if (threw) throw err;
+      let expected;
+      try { expected = value(rhs); } catch (e) { throw new Error('The expected result "' + rhs + '" is not valid JavaScript: ' + e.message); }
+      expect(got).toEqual(expected);
+    });
+  });
 }

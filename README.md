@@ -15,7 +15,33 @@ python3 -m http.server 8132 --directory spec-check
 
 Open http://localhost:8132.
 
-## Add a question
+## Add your own question (no coding of tests needed)
+
+Press **＋ Add your own question** and fill in:
+
+1. **Question code**: paste the starter `app.js` with its TODO comments.
+2. **Checks**: one line per test, `code => expected result`. **✨ Start from the TODOs** finds the
+   function names in the TODOs and writes a starting list for you to edit.
+
+```
+resolveWith(42) => 42
+rejectWith("boom") => throws "boom"
+doubleAsync(5) instanceof Promise => true
+mock: [{"id": 1, "title": "Morning Drive"}]
+getSongTitles("/songs") => ["Morning Drive"]
+mock: status 404
+safeFetch("/missing") => null
+await loadFeed(), document.querySelectorAll("li.item").length => 1
+```
+
+- Promises are awaited automatically, and objects and arrays are compared deeply.
+- `mock:` sets what `fetch()` returns for the checks below it (`fail` = network error, `status 404` = HTTP error, `none` = back to normal).
+- To test a page, put its markup in **Page HTML**, for example `<ul id="feed"></ul>`.
+
+Your questions are saved in your browser and marked **YOURS** in the list. **🔗 Copy share link** puts the whole
+question inside a URL, so anyone who opens the link gets the question added to their list.
+
+## Add a built-in question
 
 Copy an object in `questions.js` and change its fields. `tests` must be written as `function ({ ... }) { }`,
 not as method shorthand, because it is turned into a string and run inside the iframe.

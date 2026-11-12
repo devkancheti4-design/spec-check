@@ -23,11 +23,21 @@
   <div class="layout">
     <aside class="side">
       <nav id="qList" class="q-list" aria-label="Questions"></nav>
+      <div class="add-wrap"><button id="addBtn" class="btn add-btn">＋ Add your own question</button></div>
       <section class="task">
         <div id="qTopic" class="topic"></div>
         <h1 id="qTitle"></h1>
+        <div id="customActions" class="custom-actions" hidden>
+          <button id="editQ" class="btn ghost small">✎ Edit</button>
+          <button id="shareQ" class="btn ghost small">🔗 Copy share link</button>
+          <button id="deleteQ" class="btn ghost small danger">🗑 Delete</button>
+        </div>
         <h2 class="label">Your task</h2>
         <div id="qTask" class="task-body"></div>
+        <details id="checksBox" class="checks-box" hidden>
+          <summary>What gets checked (<span id="checksCount">0</span>)</summary>
+          <pre id="checksView"></pre>
+        </details>
       </section>
     </aside>
 
@@ -77,6 +87,65 @@
     </div>
     <pre id="solutionCode" class="sol"></pre>
   </dialog>
+
+  <dialog id="addDlg" class="dlg add-dlg">
+    <form id="addForm" method="dialog">
+      <div class="dlg-head">
+        <b id="addTitle">Add your own question</b>
+        <button type="button" id="closeAdd" class="btn ghost small">✕</button>
+      </div>
+      <div class="form-body">
+        <div class="row2">
+          <label>Question title *<input id="fTitle" required maxlength="80" placeholder="e.g. Promise Toolkit" /></label>
+          <label>Topic<input id="fTopic" maxlength="80" placeholder="e.g. Async JavaScript" /></label>
+        </div>
+        <label>What the reader has to do <span class="opt">(optional, shown above the editor)</span>
+          <textarea id="fTask" rows="2" placeholder="Write each function under its TODO…"></textarea>
+        </label>
+        <label>Question code: the starter app.js with its TODO comments *
+          <textarea id="fStarter" class="code" rows="9" required placeholder="// TODO 1: resolveWith(value)&#10;//   Return a Promise that RESOLVES to `value`."></textarea>
+        </label>
+        <div class="checks-head">
+          <span>Checks: how to tell whether an answer is right *</span>
+          <button type="button" id="suggestBtn" class="btn ghost small">✨ Start from the TODOs</button>
+        </div>
+        <textarea id="fChecks" class="code" rows="9" placeholder="doubleAsync(5) => 10&#10;rejectWith(&quot;boom&quot;) => throws &quot;boom&quot;"></textarea>
+        <details class="syntax">
+          <summary>How to write checks</summary>
+          <div class="syntax-body">
+            <p>Write one check per line: <code>code =&gt; expected result</code>. Each line becomes one test, and the score is out of 10.</p>
+            <table>
+              <tr><td><code>doubleAsync(5) =&gt; 10</code></td><td>Promises are awaited automatically</td></tr>
+              <tr><td><code>typeof loadFeed =&gt; "function"</code></td><td>is the function defined?</td></tr>
+              <tr><td><code>getSongById("/s", 99) =&gt; null</code></td><td>objects and arrays are compared deeply</td></tr>
+              <tr><td><code>rejectWith("boom") =&gt; throws "boom"</code></td><td>must throw or reject (the message is optional)</td></tr>
+              <tr><td><code>delay(10) instanceof Promise =&gt; true</code></td><td>any true/false expression</td></tr>
+              <tr><td><code>await loadFeed(), document.querySelectorAll("li.item").length =&gt; 3</code></td><td>run something first, then check the page</td></tr>
+              <tr><td><code>mock: [{"id":1,"title":"A"}]</code></td><td>what <code>fetch()</code> returns for the checks below</td></tr>
+              <tr><td><code>mock: status 404</code> · <code>mock: fail</code> · <code>mock: none</code></td><td>HTTP error · network failure · back to normal</td></tr>
+              <tr><td><code># a comment</code></td><td>ignored</td></tr>
+            </table>
+          </div>
+        </details>
+        <details class="syntax">
+          <summary>More: a page for the code, or a model answer</summary>
+          <label>Page HTML <span class="opt">(only if the code uses the page, e.g. <code>&lt;ul id="feed"&gt;&lt;/ul&gt;</code>)</span>
+            <textarea id="fHtml" class="code" rows="3"></textarea>
+          </label>
+          <label>Model answer <span class="opt">(optional, shown by the Solution button)</span>
+            <textarea id="fSolution" class="code" rows="6"></textarea>
+          </label>
+        </details>
+        <p id="formError" class="form-error" hidden></p>
+      </div>
+      <div class="dlg-foot">
+        <button type="button" id="cancelAdd" class="btn ghost">Cancel</button>
+        <button type="submit" id="saveAdd" class="btn primary">Save question</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
 
   <iframe id="testFrame" sandbox="allow-scripts" title="Test runner" class="test-frame" aria-hidden="true"></iframe>
 

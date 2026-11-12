@@ -14,6 +14,9 @@
   --code: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+/* keep "=>" and "!==" as typed characters, not font ligatures */
+code, pre, textarea, .CodeMirror, .CodeMirror *, .spec, .console, .summary { font-variant-ligatures: none !important; font-feature-settings: "liga" 0, "calt" 0 !important; }
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -145,6 +148,47 @@ textarea.fallback { width: 100%; background: var(--bg); color: var(--text); bord
 .dlg-head div { display: flex; gap: 6px; }
 .sol { margin: 0; padding: 14px; overflow: auto; max-height: calc(85vh - 60px); font: 13px/1.6 var(--code); color: #d8e2de; }
 
+/* ---------- custom questions ---------- */
+.add-wrap { padding: 10px; border-bottom: 1px solid var(--line); }
+.add-btn { width: 100%; background: transparent; color: var(--accent); border: 1px dashed #2f5a45; }
+.add-btn:hover { background: var(--green-bg); }
+.yours { font: 600 10px Inter, sans-serif; color: var(--accent); background: var(--green-bg); border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
+.custom-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: -6px 0 14px; }
+.btn.danger { color: #ff9a9a; }
+.task-plain { white-space: pre-wrap; }
+.checks-box { margin-top: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); }
+.checks-box summary { cursor: pointer; padding: 8px 10px; font-size: 13px; color: #c9d4d0; }
+.checks-box pre { margin: 0; padding: 0 10px 10px; font: 12px/1.6 var(--code); white-space: pre-wrap; word-break: break-word; color: #b9c7c2; }
+
+.add-dlg { width: min(820px, calc(100vw - 32px)); }
+.add-dlg form { display: flex; flex-direction: column; max-height: 90vh; }
+.form-body { padding: 14px; overflow: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.form-body > * { flex-shrink: 0; }
+.form-body textarea.code { min-height: 150px; }
+#fChecks { min-height: 190px; }
+#fHtml { min-height: 70px; }
+.form-body label { display: grid; gap: 5px; font-size: 13px; color: #c9d4d0; }
+.opt { color: var(--muted); font-size: 12px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-body input, .form-body textarea {
+  width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font: 13px/1.5 Inter, sans-serif; resize: vertical;
+}
+.form-body textarea.code { font: 12.5px/1.55 var(--code); tab-size: 2; }
+.form-body input:focus, .form-body textarea:focus { outline: 2px solid #2f5a45; border-color: #2f5a45; }
+.checks-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: #c9d4d0; margin-bottom: -6px; flex-wrap: wrap; }
+.syntax { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); }
+.syntax > summary { cursor: pointer; padding: 8px 10px; font-size: 13px; color: #c9d4d0; }
+.syntax > label { padding: 0 10px 10px; }
+.syntax-body { padding: 0 10px 10px; font-size: 12.5px; color: #b9c7c2; }
+.syntax-body p { margin: 0 0 8px; }
+.syntax-body table { border-collapse: collapse; width: 100%; }
+.syntax-body td { border-top: 1px solid var(--line); padding: 5px 6px; vertical-align: top; }
+.syntax-body td:first-child { width: 58%; word-break: break-word; }
+.form-error { margin: 0; color: #ffb4b4; background: var(--red-bg); border: 1px solid #6b1d20; border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--line); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #166534; color: #fff; padding: 9px 16px; border-radius: 8px; font-size: 13px; z-index: 10; box-shadow: 0 6px 24px rgba(0,0,0,.4); max-width: calc(100vw - 32px); }
+
 /* ---------- responsive ---------- */
 @media (max-width: 1180px) {
   .layout { grid-template-columns: 260px minmax(0, 1fr) 360px; }
@@ -154,6 +198,7 @@ textarea.fallback { width: 100%; background: var(--bg); color: var(--text); bord
   .layout { display: flex; flex-direction: column; }
   .q-select { display: block; }
   .q-list { display: none; }
+  .row2 { grid-template-columns: 1fr; }
   .side { border-right: 0; border-bottom: 1px solid var(--line); }
   .task { padding: 12px 16px; }
   .editor-host { height: 60vh; flex: none; }
